@@ -1,2 +1,1 @@
-# Web-Dev
-Practical
+# myname.github.io
