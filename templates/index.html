@@ -1,83 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link
-    rel="stylesheet"
-    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-    crossorigin="anonymous"
-  />
-  <link
-    rel="stylesheet"
-    href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-    crossorigin="anonymous"
-  />
-    <title>{% block title %}Home{% endblock %}</title>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-primary">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
-            <span class="navbar-toggler-icon" style="color: black;"></span>
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome, {{ user.username }}!</h1>
+
+
+<h2>Files:</h2>
+<ul>
+  {% for file in files %}
+    {% if file.folder_id is none %}
+        <li><a href="{{ url_for('get_file', file_id=file.id) }}">{{ file.name }}</a></li>
+        <button type="button" class="close" onclick="deleteF('{{ file.id }}')">
+          <span aria-hidden="true">&times;</span>
         </button>
-        <div class="collapse navbar-collapse" id="navbar">
-            <div class="navbar-nav">
-                {% if current_user.role==2%}
-                <a href="/logout" class="nav-item nav-link " id="logout" style="color: white;">Log Out</a>
-                <a href="/home" class="nav-item nav-link" id="home" style="color: white;">Home</a>
-                {% elif current_user.role==1%}
-                <a href="/logout" class="nav-item nav-link " id="logout" style="color: white;">Log Out</a>
-                {% else %}
-                <a href="/login" class="nav-item nav-link " id="login" style="color: white;">Login</a>
-                <a href="/sign-up" class="nav-item nav-link " id="sign_up" style="color: white;">Sign Up</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category,message in messages %}
-            {% if category == 'error' %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% else %}
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endif %}
-        {% endfor %}
     {% endif %}
-    {% endwith %}
-    <div class="container">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <script
-    src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"
-  ></script>
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"
-  ></script>
-  <script
-    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"
-  ></script>
-  <script type="text/javascript"
-  src="{{url_for('static', filename= 'index.js')}}">
-    
-  </script>
-</body>
-</html>
+  {% endfor %}
+</ul>
+<h2>Folders:</h2>
+<ul>
+    {% for folder in folders %}
+      {% if folder.parent_folder_id is none %}
+          <li><a href="{{ url_for('get_folder', folder_id=folder.id) }}">{{ folder.name }}</a></li>
+          <button type="button" class="close" onclick="deleteFolder('{{ folder.id }}')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+<!-- Upload file -->
+<form action="/upload-file" method="post" enctype="multipart/form-data">
+    <input type="file" id="inputFile" name="inputFile" accept=".txt, .fastq">
+
+    <button type="submit" class="btn btn-primary">Add File</button>
+</form>
+
+<!-- Create new folder -->
+<form action="/folder" method="post">
+    <input type="text" id="folderName" name="folderName" placeholder="Enter folder name">
+
+    <button type="submit" class="btn btn-primary">Create Folder</button>
+</form>
+
+{% endblock %}

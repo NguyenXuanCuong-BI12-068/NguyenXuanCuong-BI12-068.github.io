@@ -98,7 +98,7 @@ def home():
     print(f"folder: {folders}")
     files = File.query.filter_by(user_id = current_user.id).all()
     print(f"file: {files}")
-    return render_template("home.html",folders = folders, user = current_user, files = files)
+    return render_template("index.html",folders = folders, user = current_user, files = files)
 @app.route('/logout')
 @login_required
 def logout():
